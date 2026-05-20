@@ -73,9 +73,7 @@ SELECT
     count(c.name) AS ref
 FROM
     constumers r
-    LEFT JOIN constumers c ON c.referred_by = r.id
+    JOIN constumers c ON c.referred_by = r.id
 GROUP BY
-    r.id
-HAVING
-    count(c.name) > 0;
+    r.id;
 
