@@ -15,26 +15,47 @@ VALUES
 (2, 'event B', '2024-01-05'),
 (3, 'event C', '2024-01-10');
 
-WITH nextEvent AS (
-    SELECT
-        coalesce(e.event_name, 'No Next Event')
-    FROM
-        event e
-    WHERE
-        condition
-)
+-- SELECT
+--     coalesce(n.event_name, 'No Next Event') AS next_event
+-- FROM
+--     event e
+--     LEFT JOIN event n ON n.start_date > e.start_date
+-- GROUP BY
+--     e.event_name,
+--     n.event_name;
 SELECT
-    *
+    e.event_name AS current_event,
+    coalesce(n.event_name, 'No Next Event') AS next_event
 FROM
-    cte_name;
-
-WITH
-SELECT
-    SELECT
-        e.event_name AS current_event,
-    FROM
-        event e
+    event e
     LEFT JOIN event n ON n.start_date > e.start_date
 GROUP BY
-    current_event;
+    e.event_name,
+    n.event_name;
 
+-- Drop an existing table 'constumers'
+DROP TABLE constumers;
+
+-- Create a new table 'constumers' with a primary key and columns
+CREATE TABLE constumers(
+    id serial PRIMARY KEY,
+    name varchar,
+    referred_by int
+);
+
+-- Insert data into 'constumers'
+INSERT INTO constumers(name, referred_by)
+VALUES
+    ('alice', NULL),
+('bob', NULL),
+('charlie', 2),
+('david', NULL),
+('eva', 3),
+('frank', 4);
+
+SELECT
+    c.name AS constumers_name,
+    r.name AS referred_name
+FROM
+    constumers c
+    LEFT JOIN constumers r ON r.referred_by = c.id
