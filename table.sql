@@ -15,23 +15,14 @@ VALUES
 (2, 'event B', '2024-01-05'),
 (3, 'event C', '2024-01-10');
 
--- SELECT
---     coalesce(n.event_name, 'No Next Event') AS next_event
--- FROM
---     event e
---     LEFT JOIN event n ON n.start_date > e.start_date
--- GROUP BY
---     e.event_name,
---     n.event_name;
 SELECT
     e.event_name AS current_event,
-    coalesce(n.event_name, 'No Next Event') AS next_event
+    coalesce(string_agg(n.event_name, ','), 'No Next Event') AS next_events
 FROM
     event e
     LEFT JOIN event n ON n.start_date > e.start_date
 GROUP BY
-    e.event_name,
-    n.event_name;
+    e.event_name;
 
 -- Drop an existing table 'constumers'
 DROP TABLE constumers;
@@ -51,11 +42,40 @@ VALUES
 ('charlie', 2),
 ('david', NULL),
 ('eva', 3),
-('frank', 4);
+('frank', 4),
+('rudy', 4);
 
 SELECT
     c.name AS constumers_name,
-    r.name AS referred_name
+    r.name AS referred_by
 FROM
     constumers c
-    LEFT JOIN constumers r ON r.referred_by = c.id
+    LEFT JOIN constumers r ON c.referred_by = r.id;
+
+SELECT
+    c.name AS constumers_name
+FROM
+    constumers c
+WHERE
+    c.referred_by IS NULL;
+
+SELECT
+    r.name AS referred_by,
+    count(c.name)
+FROM
+    constumers r
+    LEFT JOIN constumers c ON c.referred_by = r.id
+GROUP BY
+    r.id;
+
+SELECT
+    r.name AS referred_by,
+    count(c.name) AS ref
+FROM
+    constumers r
+    LEFT JOIN constumers c ON c.referred_by = r.id
+GROUP BY
+    r.id
+HAVING
+    count(c.name) > 0;
+
